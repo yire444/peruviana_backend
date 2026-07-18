@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements IUserService{
+public class UserServiceImpl implements IUserService {
 
     private final IUserRepository userRepo;
     private final UserMapper userMap;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements IUserService{
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
     }
 
-    public void sendVerificationEmail(String email, String name, String code) {
+    private void sendVerificationEmail(String email, String name, String code) {
         System.out.println("DEBUG: Sending OTP [" + code + "] to email: " + email);
     }
 
@@ -35,7 +35,7 @@ public class UserServiceImpl implements IUserService{
     @Override
     @Transactional
     public UserResponseDto registerUser(UserRegisterDto dto) {
-        // Guard Clauses: Business Validation for duplicates (Using IllegalArgumentException)
+        // Guard Clauses: Unique data validation
         if (userRepo.existsByDocumentNumber(dto.getDocumentNumber())) {
             throw new IllegalArgumentException("El número de documento ya ha sido registrado.");
         }
@@ -46,10 +46,15 @@ public class UserServiceImpl implements IUserService{
             throw new IllegalArgumentException("El número de teléfono ya está registrado.");
         }
 
+        // Security Guard Clause: Ensure inputs match before mapping
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new IllegalArgumentException("Las contraseñas no coinciden");
+        }
+
         // DTO -> ENTITY
         UserEntity userEntity = userMap.toEntity(dto);
 
-        //TOKEN GENERATION
+        // TOKEN GENERATION
         String verificationToken = String.format("%06d", new Random().nextInt(999999));
         userEntity.setVerificationCode(verificationToken);
         userEntity.setActive(false);
@@ -65,7 +70,6 @@ public class UserServiceImpl implements IUserService{
     @Override
     @Transactional
     public void verifyAccount(String email, UserVerificationDto dto) {
-
         UserEntity user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
@@ -120,9 +124,7 @@ public class UserServiceImpl implements IUserService{
                 .collect(Collectors.toList());
     }
 
-    //U: UPDATE USER EMAIL, PHONE NUMBER AND PASSWORD
-
-    //EMAIL
+    // U: UPDATE EMAIL
     @Override
     @Transactional
     public UserResponseDto changeEmail(Long id, UserChangeEmailDto dto) {
@@ -140,7 +142,7 @@ public class UserServiceImpl implements IUserService{
         return userMap.toResponseDto(userUpdate);
     }
 
-    //PHONE NUMBER
+    // U: UPDATE PHONE NUMBER
     @Override
     @Transactional
     public UserResponseDto changePhone(Long id, UserChangePhoneDto dto) {
@@ -158,7 +160,7 @@ public class UserServiceImpl implements IUserService{
         return userMap.toResponseDto(userUpdate);
     }
 
-    //PASSWORD
+    // U: UPDATE PASSWORD
     @Override
     @Transactional
     public void changePassword(Long id, UserChangePasswordDto dto) {
@@ -175,7 +177,7 @@ public class UserServiceImpl implements IUserService{
         userRepo.save(user);
     }
 
-    // D: DELETE USERS
+    // D: DELETE USERS (Logical Deactivation)
     @Override
     @Transactional
     public void deleteUser(Long id) {
