@@ -16,7 +16,7 @@ public interface IUserService {
     UserResponseDto login(UserLoginDto dto);
 
     // R: LIST USERS AND FILTERS
-    List<UserResponseDto> searchUsers(String documentNumber, String email, String phoneNumber, Boolean active);
+    List<UserResponseDto> searchUsers(UserFilterDto dto);
 
     // U: UPDATE EMAIL
     UserResponseDto changeEmail(Long id, UserChangeEmailDto dto);
