@@ -1,10 +1,13 @@
 package com.peruviana.product.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductResponseDto {
 
     private Long id;

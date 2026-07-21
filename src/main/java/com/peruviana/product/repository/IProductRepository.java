@@ -1,4 +1,4 @@
-package com.peruviana.product.Repository;
+package com.peruviana.product.repository;
 
 import com.peruviana.product.entity.ProductEntity;
 import org.springframework.data.domain.Sort;
