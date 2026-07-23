@@ -23,10 +23,10 @@ public class ProductEntity {
     @Column(name = "id_product")
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 50)
+    @Column(name = "name", nullable = false, length = 50, unique = true)
     private String name;
 
-    @Column(name = "description", nullable = false, length = 250)
+    @Column(name = "description", nullable = false, length = 250, unique = true)
     private String description;
 
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
